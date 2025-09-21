@@ -9,50 +9,27 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var pets: [Pet]
-    @State private var showingAddPet = false
-    
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(pets) { pet in
-                    PetCardView(pet: pet)
-                        .listRowSeparator(.hidden)
+        TabView {
+            PetsView()
+                .tabItem {
+                    Label("Pets", systemImage: "pawprint")
                 }
-                .onDelete(perform: deletePets)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
+
+            RemindersView()
+                .tabItem {
+                    Label("Reminders", systemImage: "bell")
                 }
-                ToolbarItem {
-                    Button {
-                        showingAddPet = true
-                    } label: {
-                        Label("Add Pet", systemImage: "plus")
-                    }
+
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gearshape")
                 }
-            }
-            .listStyle(.plain)
-            .sheet(isPresented: $showingAddPet) {
-                AddPetView()
-            }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-    
-    private func deletePets(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(pets[index])
-            }
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Pet.self, inMemory: true)
+        .modelContainer(for: [Pet.self, Reminder.self, AppConfiguration.self], inMemory: true)
 }

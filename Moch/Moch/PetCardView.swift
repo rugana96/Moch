@@ -5,11 +5,12 @@ import SwiftData
 struct PetCardView: View {
     let pet: Pet
     @Environment(\.modelContext) private var modelContext
-
+    
     // Local image selection state (in-memory). Persist later in the model if desired.
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var imageData: Data? = nil
-
+    @State private var isPresentingPhotoPicker: Bool = false
+    
     var body: some View {
         VStack(alignment: .center, spacing: 12) {
             ZStack(alignment: .bottomTrailing) {
@@ -32,8 +33,11 @@ struct PetCardView: View {
                 .clipShape(Circle())
                 .overlay(Circle().strokeBorder(.white.opacity(0.7), lineWidth: 2))
                 .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 3)
-
-                PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
+                .padding(.top, 16)
+                
+                Button {
+                    isPresentingPhotoPicker = true
+                } label: {
                     Image(systemName: "camera.fill")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.white)
@@ -41,9 +45,16 @@ struct PetCardView: View {
                         .background(.blue, in: Circle())
                         .overlay(Circle().strokeBorder(.white.opacity(0.7), lineWidth: 1))
                 }
+                .buttonStyle(.plain)
+                .photosPicker(
+                    isPresented: $isPresentingPhotoPicker,
+                    selection: $selectedItem,
+                    matching: .images,
+                    photoLibrary: .shared()
+                )
                 .offset(x: 6, y: 6)
             }
-
+            
             VStack(alignment: .center, spacing: 6) {
                 VStack(spacing: 2) {
                     Text(pet.name)
@@ -52,15 +63,13 @@ struct PetCardView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-
-                if let typeName = pet.type.displayName {
-                    HStack(spacing: 8) {
-                        Image(systemName: pet.type.systemImageName)
-                        Text(typeName)
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                
+                HStack(spacing: 8) {
+                    Image(systemName: pet.type.systemImageName)
+                    Text(pet.type.displayName)
                 }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             }
             .padding(.horizontal, 0)
             .padding(.bottom, 8)
@@ -80,8 +89,10 @@ struct PetCardView: View {
             await loadImageData()
         }
         .animation(.snappy, value: imageData)
+        .listRowSeparator(.hidden)
+        .listRowBackground(Color.clear)
     }
-
+    
     private func loadImageData() async {
         guard let selectedItem else { return }
         do {
@@ -95,25 +106,6 @@ struct PetCardView: View {
         } catch {
             // Handle errors silently for now
             print("Failed to load image data: \(error)")
-        }
-    }
-}
-
-// Helpers for PetType display; provide safe fallbacks if not defined in the project
-private extension PetType {
-    var displayName: String? {
-        switch self {
-        case .dog: return "Dog"
-        case .cat: return "Cat"
-        default: return String(describing: self)
-        }
-    }
-
-    var systemImageName: String {
-        switch self {
-        case .dog: return "pawprint.fill"
-        case .cat: return "pawprint"
-        default: return "pawprint"
         }
     }
 }

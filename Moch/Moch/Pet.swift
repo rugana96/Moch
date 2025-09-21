@@ -31,3 +31,19 @@ final class Pet {
         self.imageData = imageData
     }
 }
+
+extension PetType {
+    var displayName: String {
+        switch self {
+        case .dog: return "Dog"
+        case .cat: return "Cat"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .dog: return "pawprint.fill"
+        case .cat: return "pawprint"
+        }
+    }
+}

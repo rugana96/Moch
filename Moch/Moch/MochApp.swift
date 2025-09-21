@@ -13,6 +13,8 @@ struct MochApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Pet.self,
+            Reminder.self,
+            AppConfiguration.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
