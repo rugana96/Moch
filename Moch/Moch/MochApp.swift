@@ -14,7 +14,8 @@ struct MochApp: App {
         let schema = Schema([
             Pet.self,
             Reminder.self,
-            AppConfiguration.self
+            AppConfiguration.self,
+            WeightEntry.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

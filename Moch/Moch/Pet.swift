@@ -18,6 +18,7 @@ enum PetType: String, Codable, CaseIterable, Sendable {
 
 @Model
 final class Pet {
+    @Attribute(.unique) var id: UUID = UUID()
     // Stored properties
     var name: String
     var birthday: Date

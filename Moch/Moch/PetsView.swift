@@ -5,7 +5,7 @@ struct PetsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Pet.name, order: .forward) private var pets: [Pet]
     @State private var showingAddPet = false
-    @State private var selectedPet: Pet?
+    @State private var selectedPetForWeight: Pet?
 
     var body: some View {
         NavigationStack {
@@ -20,14 +20,25 @@ struct PetsView: View {
                     }
                 } else {
                     ForEach(pets) { pet in
-                        Button {
-                            selectedPet = pet
-                        } label: {
-                            PetCardView(pet: pet)
-                                .padding(.vertical, 8)
-                                .padding(.horizontal, 16)
+                        VStack(spacing: 12) {
+                            NavigationLink {
+                                PetDetailView(pet: pet)
+                            } label: {
+                                PetCardView(pet: pet)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                selectedPetForWeight = pet
+                            } label: {
+                                Label("Weight Tracker", systemImage: "scalemass")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.mint)
                         }
-                        .buttonStyle(.plain)
                         .listRowInsets(EdgeInsets())
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden, edges: .all)
@@ -58,8 +69,10 @@ struct PetsView: View {
             .sheet(isPresented: $showingAddPet) {
                 AddPetView()
             }
-            .navigationDestination(item: $selectedPet) { pet in
-                PetDetailView(pet: pet)
+            .sheet(item: $selectedPetForWeight) { pet in
+                NavigationStack {
+                    WeightTrackerView(pet: pet)
+                }
             }
         }
     }

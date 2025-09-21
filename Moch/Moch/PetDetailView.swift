@@ -4,6 +4,7 @@ import SwiftData
 struct PetDetailView: View {
     let pet: Pet
     @Query private var reminders: [Reminder]
+    @State private var showingWeightTracker = false
 
     init(pet: Pet) {
         self.pet = pet
@@ -28,6 +29,20 @@ struct PetDetailView: View {
                 LabeledContent("Type", value: pet.type.displayName)
             }
 
+            Section("Weight") {
+                Button {
+                    showingWeightTracker = true
+                } label: {
+                    Label("Manage Weight Entries", systemImage: "scalemass")
+                }
+
+                NavigationLink {
+                    WeightProgressView(pet: pet)
+                } label: {
+                    Label("View Weight Progress", systemImage: "chart.line.uptrend.xyaxis")
+                }
+            }
+
             Section("Reminders") {
                 if reminders.isEmpty {
                     ContentUnavailableView("No reminders",
@@ -42,5 +57,10 @@ struct PetDetailView: View {
             }
         }
         .navigationTitle(pet.name)
+        .sheet(isPresented: $showingWeightTracker) {
+            NavigationStack {
+                WeightTrackerView(pet: pet)
+            }
+        }
     }
 }
